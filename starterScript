@@ -1,0 +1,53 @@
+#! /bin/bash
+
+
+distroGET=$(cat /etc/issue)
+
+
+echo $distroGET
+
+if [ -x "$(command -v apt)" ]; then PM="apt"
+elif [ -x "$(command -v dnf)" ]; then PM="dnf"
+elif [ -x "$(command -v pacman)" ]; then PM="pacman" 
+else echo "your package manager is not  supported for this script "; 
+fi
+
+
+echo $PM
+
+case $PM in
+	apt)
+		echo -n "your package manager is: $PM, and your distro is: $distroGET"
+		TEMP_DEB="$(mktemp)" &&
+		wget -O "$TEMP_DEB" 'https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb' &&
+		sudo dpkg -i "$TEMP_DEB"
+		rm -f "$TEMP_DEB"
+		if [ -x "$(command -v snap)"]; then snap install spotify
+		else echo "instale snap";
+		fi
+		sudo apt install htop
+		;;
+	
+	dnf)
+		echo -n "your package manager is: $PM, and your distro is: $distroGET" 
+		TEMP_DEB="$(mktemp)" &&
+		wget -O "$TEMP_DEB" 'https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm' &&
+		sudo dnf install "$TEMP_DEB"
+		rm -f "$TEMP_DEB"
+                ;;
+
+	pacman)
+		echo -n "your package manager is: $PM, and your distro is: $distroGET" 
+                sudo pacman -S htop git gparted
+		sudo pacman -Syuu
+		git clone https://aur.archlinux.org/yay.git
+		cd yay
+		makepkg -si
+		cd ..
+		clear
+		echo "installed YAY !"
+		yay -S google-chrome 
+
+		;;
+
+esac
